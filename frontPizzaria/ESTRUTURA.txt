@@ -1,0 +1,230 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                   🍕 ESTRUTURA FRONTEND - APP PIZZARIA                    ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+frontPizzaria/
+│
+├── 📄 README.md                 # Documentação principal
+├── 📄 ARQUITETURA.md            # Detalhamento da arquitetura DDD
+└── 📄 ESTRUTURA.txt             # Este arquivo
+
+┌─ 🖥️  DASHBOARD (Atendimento e Gerenciamento)
+│
+├── dashboard/src/
+│   │
+│   ├── shared/                  # Código compartilhado
+│   │   ├── domain/
+│   │   │   └── interfaces.ts    # IRepository, IUseCase, IEntity
+│   │   └── infra/
+│   │       ├── http/
+│   │       │   ├── ApiClient.ts
+│   │       │   └── ApiConfig.ts
+│   │       └── storage/
+│   │           └── TokenStorage.ts
+│   │
+│   └── modules/
+│       │
+│       ├── 🔐 auth/
+│       │   ├── domain/entities/
+│       │   │   └── User.ts      # Entidade usuário (admin/attendant/kitchen)
+│       │   ├── application/usecases/
+│       │   │   ├── LoginUseCase.ts
+│       │   │   └── LogoutUseCase.ts
+│       │   ├── infra/repositories/
+│       │   │   └── AuthRepository.ts
+│       │   └── presentation/pages/
+│       │       └── LoginPage.tsx
+│       │
+│       ├── 📋 order/
+│       │   ├── domain/entities/
+│       │   │   ├── Order.ts     # Entidade pedido
+│       │   │   └── OrderStatus.ts
+│       │   ├── application/usecases/
+│       │   │   ├── ListOrdersUseCase.ts
+│       │   │   ├── DetailOrderUseCase.ts
+│       │   │   ├── ChangeOrderStatusUseCase.ts
+│       │   │   └── FinishOrderUseCase.ts
+│       │   ├── infra/repositories/
+│       │   │   └── OrderRepository.ts
+│       │   └── presentation/
+│       │       ├── pages/
+│       │       │   ├── OrderListPage.tsx
+│       │       │   └── OrderDetailPage.tsx
+│       │       └── components/
+│       │           ├── OrderCard.tsx
+│       │           └── OrderStatusBadge.tsx
+│       │
+│       └── 🍔 product/
+│           ├── domain/entities/
+│           │   ├── Product.ts   # Entidade produto
+│           │   └── Category.ts
+│           ├── application/usecases/
+│           │   ├── ListProductsUseCase.ts
+│           │   ├── ListCategoriesUseCase.ts
+│           │   ├── CreateProductUseCase.ts
+│           │   └── UpdateProductUseCase.ts
+│           ├── infra/repositories/
+│           │   └── ProductRepository.ts
+│           └── presentation/pages/
+│               ├── ProductListPage.tsx
+│               └── ProductFormPage.tsx
+│
+└── App.tsx
+
+
+┌─ 📱 CUSTOMER (Web/Mobile para Clientes)
+│
+├── customer/src/
+│   │
+│   ├── shared/                  # Código compartilhado
+│   │   ├── domain/
+│   │   │   └── interfaces.ts
+│   │   └── infra/
+│   │       ├── http/
+│   │       │   ├── ApiClient.ts
+│   │       │   └── ApiConfig.ts
+│   │       └── storage/
+│   │           ├── LocalStorage.ts  # Web
+│   │           └── AsyncStorage.ts  # Mobile
+│   │
+│   └── modules/
+│       │
+│       ├── 🔐 auth/
+│       │   ├── domain/entities/
+│       │   │   └── Customer.ts  # Entidade cliente
+│       │   ├── application/usecases/
+│       │   │   ├── SignUpUseCase.ts
+│       │   │   └── SignInUseCase.ts
+│       │   ├── infra/repositories/
+│       │   │   └── AuthRepository.ts
+│       │   └── presentation/pages/
+│       │       ├── SignUpPage.tsx
+│       │       └── SignInPage.tsx
+│       │
+│       ├── 🍽️  catalog/
+│       │   ├── domain/entities/
+│       │   │   ├── Product.ts   # Entidade produto
+│       │   │   └── Category.ts
+│       │   ├── application/usecases/
+│       │   │   ├── ListProductsByCategoryUseCase.ts
+│       │   │   ├── SearchProductsUseCase.ts
+│       │   │   └── GetProductDetailUseCase.ts
+│       │   ├── infra/repositories/
+│       │   │   └── CatalogRepository.ts
+│       │   └── presentation/pages/
+│       │       └── CatalogPage.tsx
+│       │           └── components/
+│       │               ├── CategoryTabs.tsx
+│       │               └── ProductCard.tsx
+│       │
+│       └── 🛒 cart/
+│           ├── domain/entities/
+│           │   ├── Cart.ts      # Entidade carrinho
+│           │   └── CartItem.ts
+│           ├── application/usecases/
+│           │   ├── AddToCartUseCase.ts
+│           │   ├── RemoveFromCartUseCase.ts
+│           │   ├── UpdateCartItemUseCase.ts
+│           │   ├── ClearCartUseCase.ts
+│           │   └── CreateOrderUseCase.ts
+│           ├── infra/repositories/
+│           │   ├── CartRepository.ts    # LocalStorage
+│           │   └── OrderRepository.ts
+│           └── presentation/
+│               ├── pages/
+│               │   └── CartPage.tsx
+│               └── components/
+│                   ├── CartItem.tsx
+│                   └── CheckoutSummary.tsx
+│
+└── App.tsx
+
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                        🏗️  FLUXO DE DADOS DDD                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+DASHBOARD - Listar Pedidos:
+┌─────────────┐
+│ OrderListPage.tsx (UI)
+└──────┬──────┘
+       │ usa
+       ▼
+┌──────────────────────┐
+│ ListOrdersUseCase    │ (Lógica de Negócio)
+└──────┬───────────────┘
+       │ chama
+       ▼
+┌──────────────────────┐
+│ OrderRepository      │ (Integração API)
+└──────┬───────────────┘
+       │ faz requisição
+       ▼
+┌──────────────────────┐
+│ Backend API          │ (http://localhost:3333)
+└──────────────────────┘
+
+
+CUSTOMER - Adicionar ao Carrinho:
+┌──────────────────┐
+│ ProductCard.tsx  │ (UI)
+└──────┬───────────┘
+       │ clica em "Adicionar"
+       ▼
+┌──────────────────────────┐
+│ AddToCartUseCase         │ (Lógica)
+└──────┬───────────────────┘
+       │ chama
+       ▼
+┌──────────────────────────┐
+│ CartRepository           │ (LocalStorage)
+└──────┬───────────────────┘
+       │ salva
+       ▼
+┌──────────────────────────┐
+│ Cart (Entidade Local)    │
+└──────────────────────────┘
+
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                      ✅ ARQUIVOS IMPLEMENTADOS                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+DASHBOARD:
+✅ shared/domain/interfaces.ts
+✅ modules/auth/domain/entities/User.ts
+✅ modules/order/domain/entities/Order.ts
+✅ modules/product/domain/entities/Product.ts
+
+CUSTOMER:
+✅ shared/domain/interfaces.ts
+✅ modules/auth/domain/entities/Customer.ts
+✅ modules/catalog/domain/entities/Product.ts
+✅ modules/cart/domain/entities/Cart.ts
+
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                      📚 PRÓXIMOS PASSOS                                   ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+DASHBOARD:
+1. [ ] Criar AuthRepository e LoginUseCase
+2. [ ] Criar OrderRepository e ListOrdersUseCase
+3. [ ] Implementar OrderListPage e OrderCard
+4. [ ] Criar fluxo de atualizar status do pedido
+
+CUSTOMER:
+1. [ ] Criar AuthRepository e SignUpUseCase
+2. [ ] Criar CatalogRepository e ListProductsUseCase
+3. [ ] Implementar CatalogPage e ProductCard
+4. [ ] Criar CartRepository com LocalStorage
+5. [ ] Implementar fluxo de checkout
+
+COMPARTILHADO:
+1. [ ] Configurar package.json em ambas as pastas
+2. [ ] Setup TypeScript
+3. [ ] Configurar eslint e prettier
+4. [ ] Setup state management (Redux/Context)
+
+
+═══════════════════════════════════════════════════════════════════════════════
