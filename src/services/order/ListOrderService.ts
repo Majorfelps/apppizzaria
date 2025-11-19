@@ -10,6 +10,13 @@ class ListOrderService{
             },
             orderBy:{
                 created_at: 'desc'
+            },
+            include:{
+                items: {
+                    include: {
+                        product: true
+                    }
+                }
             }
         })
         return orders

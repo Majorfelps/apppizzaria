@@ -15,7 +15,7 @@ app.use(cors());
 app.use(router);
 
 app.use(
-    './files',
+    '/files',
     express.static(path.resolve(__dirname, '..', 'tmp'))
 )
 
